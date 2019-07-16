@@ -82,7 +82,7 @@ class Blockchain:
             if response.status_code==200:
                 length=response.json()['length']
                 chain=response.json()['chain']
-                if length>max_length and self.is_chain_calid(chain):
+                if length>max_length and self.is_chain_valid(chain):
                     max_length=length
                     longest_chain=chain
         if longest_chain:
@@ -107,7 +107,7 @@ def mine_block():
     previous_proof=previous_block['proof']
     proof=blockchain.proof_of_work(previous_proof)
     previous_hash=blockchain.hash(previous_block)
-    blockchain.add_transactions(sender=node_address,receiver='Kira',amount=1)     #Sender who is sending the btc receiver you are recieving reward and reward is amount
+    blockchain.add_transactions(sender=node_address,receiver='Sara',amount=1)     #Sender who is sending the btc receiver you are recieving reward and reward is amount
     block=blockchain.create_block(proof,previous_hash)
     response={'message':'Congratulation you just mined a block',
               'index':block['index'],
@@ -143,12 +143,12 @@ def add_transaction():
     transaction_keys=['sender','receiver','amount']
     if not all(key in json for key in transaction_keys):
         return 'Some elemetns of transactions are missing',400
-    index=blockcain.add_transaction(json['sender'],json['receiver'],json['amount'])
+    index=blockchain.add_transaction(json['sender'],json['receiver'],json['amount'])
     response={'message':f'This transaction will be added to Block {index}'}
     return jsonify(response),201
 
 #Connecting new nodes
-@app.route('/connect_node',method=['POST'])
+@app.route('/connect_node',methods=['POST'])
 def connect_node():
     json=request.get_json()
     nodes=json.get('nodes')                                                         # "nodes"=["http://127.0.0.1:5001","http://127.0.0.1:5002","http://127.0.0.1:5003"]
@@ -161,7 +161,7 @@ def connect_node():
     return jsonify(response),201
 
 #Replacing the chain by the longest chain if needed
-@app.route('/replace_chain',method=['GET'])
+@app.route('/replace_chain',methods=['GET'])
 def replace_chain():
     is_chain_replaced=blockchain.replace_chain()
     if is_chain_replaced:
@@ -176,4 +176,4 @@ def replace_chain():
 
 
 #Running the application
-app.run(host='0.0.0.0',port=5000)
+app.run(host='0.0.0.0',port=5003)
